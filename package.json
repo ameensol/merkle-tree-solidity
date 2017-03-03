@@ -1,0 +1,38 @@
+{
+  "name": "merkle-tree-solidity",
+  "version": "1.0.0",
+  "description": "merkle tree implementation in JS that matches Solidity",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha ./js/loader_test.js -R spec --timeout 2000000",
+    "testrpc": "testrpc -d -m elegant ability lawn fiscal fossil general swarm trap bind require exchange ostrich",
+    "build": "babel ./js/merkle.js --out-file index.js --source-maps inline",
+    "prepublish": "npm run build"
+  },
+  "author": "Ameen Soleimani",
+  "license": "MIT",
+  "dependencies": {
+    "es6-promisify": "^5.0.0",
+    "ether-pudding": "^3.2.0",
+    "ethereumjs-util": "^5.1.1",
+    "ethjs-contract": "^0.1.7",
+    "ethjs-provider-http": "^0.1.4",
+    "ethjs-query": "^0.2.1",
+    "left-pad": "^1.1.3",
+    "solc": "^0.4.7",
+    "web3": "^0.17.0-beta"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.23.0",
+    "babel-eslint": "^6.0.2",
+    "babel-polyfill": "^6.8.0",
+    "babel-preset-es2015": "^6.6.0",
+    "babel-preset-es2015-node5": "^1.2.0",
+    "babel-preset-stage-2": "^6.5.0",
+    "babel-register": "^6.18.0",
+    "chai": "^3.5.0",
+    "eslint": "^2.9.0",
+    "ethereumjs-testrpc": "^3.0.3",
+    "mocha": "^3.2.0"
+  }
+}

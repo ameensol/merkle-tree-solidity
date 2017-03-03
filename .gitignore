@@ -1,0 +1,14 @@
+node_modules/
+config.json
+build/
+npm-debug.log
+testdb/
+serverdb/
+
+*~
+.*~
+.*.~
+*.swp
+*.swo
+.*.swp
+.*.swo

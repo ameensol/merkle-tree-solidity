@@ -149,7 +149,7 @@ describe('solidity', async () => {
     eth = result.eth
     accounts = result.accounts
     web3 = result.web3
-    checkProofSolidity = checkProofSolidityFactory(merkleProof)
+    checkProofSolidity = checkProofSolidityFactory(merkleProof.checkProof)
   })
 
   it('checkProof - two', async () => {

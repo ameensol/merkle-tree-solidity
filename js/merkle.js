@@ -49,12 +49,12 @@ const merkleRoot = function(elements) {
 
 // converts buffers from MerkleRoot functions into hex strings
 // merkleProof is the contract abstraction for MerkleProof.sol
-const checkProofSolidityFactory = function(merkleProof) {
+const checkProofSolidityFactory = function(checkProofContractMethod) {
   return function(proof, root, hash) {
     proof = '0x' + proof.map(e => e.toString('hex')).join('')
     root = bufToHex(root)
     hash = bufToHex(hash)
-    return merkleProof.checkProof(proof, root, hash)
+    return checkProofContractMethod(proof, root, hash)
   }
 }
 

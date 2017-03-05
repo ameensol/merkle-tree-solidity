@@ -8,6 +8,17 @@ JS - Solidity sha3 merkle tree bridge. Generate proofs in JS; verify in Solidity
 npm install --save merkle-tree-solidity
 ```
 
+## Credit
+
+This is a port of Raiden's merkle tree python module and the solidity code is
+a close copy.
+
+Merkle Tree
+https://github.com/raiden-network/raiden/blob/master/raiden/mtree.py
+
+Solidity
+https://github.com/raiden-network/raiden/blob/master/raiden/smart_contracts/NettingChannelLibrary.sol#L356-L370
+
 ## Usage
 
 ```js

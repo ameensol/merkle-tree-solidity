@@ -1,4 +1,4 @@
-## ethjs-util
+## merkle-tree-solidity
 
 JS - Solidity sha3 merkle tree bridge. Generate proofs in JS; verify in Solidity.
 

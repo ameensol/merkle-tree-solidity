@@ -3,7 +3,7 @@ import p from 'es6-promisify'
 import Web3 from 'web3'
 import { sha3 } from 'ethereumjs-util'
 import setup from './setup'
-import MerkleTree, { checkProof, merkleRoot, checkProofSolidityFactory } from './merkle'
+import MerkleTree, { checkProof, merkleRoot, checkProofSolidityFactory } from '../index'
 
 describe('MerkleTree', () => {
   it('empty', () => {
@@ -70,7 +70,7 @@ describe('MerkleTree', () => {
     const root = merkleTree.getRoot()
 
     assert.sameMembers(proof0, [hash_1])
-    assert.ok(root.equals(sha3(hash_0 + hash_1)))
+    assert.ok(root.equals(sha3(bufSortJoin(hash_0, hash_1))))
     assert.ok(checkProof(proof0, root, hash_0))
 
     const proof1 = merkleTree.getProof(hash_1)
@@ -80,17 +80,16 @@ describe('MerkleTree', () => {
   })
 
   it('three', () => {
-    const sortJoin = (first, second) => ''.join([first, second].sort())
-
     const hash_0 = Buffer(makeString('a', 32))
     const hash_1 = Buffer(makeString('b', 32))
     const hash_2 = Buffer(makeString('c', 32))
 
     const hash_01 = Buffer('6d65ef9ca93d3516a4d38ab7d989c2b500e2fc89ccdcf878f9c46daaf6ad0d5b', 'hex')
 
-    assert.ok(sha3(hash_0 + hash_1).equals(hash_01))
+    const calculated_01 = sha3(bufSortJoin(hash_0, hash_1))
+    assert.ok(calculated_01.equals(hash_01))
 
-    const calculatedRoot = sha3(hash_2 + hash_01)
+    const calculatedRoot = sha3(bufSortJoin(hash_01, hash_2))
 
     const merkleTree = new MerkleTree([hash_0, hash_1, hash_2])
     const proof0 = merkleTree.getProof(hash_0)
@@ -132,12 +131,8 @@ describe('MerkleTree', () => {
 
 describe('solidity', async () => {
 
-  // removing constant makes solidity return a txHash instead of the return
-  // value
-
   let merkleProof, eth, accounts, web3
   let checkProofSolidity
-  let filter
 
   before(async () => {
     let result = await setup()
@@ -146,7 +141,6 @@ describe('solidity', async () => {
     accounts = result.accounts
     web3 = result.web3
     checkProofSolidity = checkProofSolidityFactory(merkleProof.checkProof)
-    filter = web3.eth.filter({ address: merkleProof.address, fromBlock: 0 })
   })
 
   it('checkProof - two', async () => {
@@ -184,28 +178,19 @@ describe('solidity', async () => {
     assert.notOk((await checkProofSolidity(proof0, root, hash_0))[0])
   })
 
-  it.only('checkProof - many', async () => {
+  it('checkProof - many', async () => {
     const many = 10
 
     for (let i = 1; i <= many; i++) {
       let elements = range(i).map(e => sha3(e))
       elements.sort(Buffer.compare)
-      console.log('elements')
-      console.log(elements.map(e => `0x${e.toString('hex')}`))
       let merkleTree = new MerkleTree(elements)
       let root = merkleTree.getRoot()
-      console.log('root:', root)
 
       for (let element of elements) {
-        console.log(i, element)
         let proof = merkleTree.getProof(element)
-        console.log('proof:', proof)
         assert.ok(checkProof(proof, root, element))
-        let result = (await checkProofSolidity(proof, root, element))
-        console.log('result:', result[0])
-        let check = Buffer(result[0].slice(2), 'hex').equals(root)
-        console.log('check:', check)
-        assert.ok(check)
+        assert.ok((await checkProofSolidity(proof, root, element))[0])
       }
 
       const reverseTree = new MerkleTree(elements.reverse())
@@ -213,6 +198,10 @@ describe('solidity', async () => {
     }
   })
 })
+
+function bufSortJoin(...args) {
+  return Buffer.concat([...args].sort(Buffer.compare))
+}
 
 function makeString(char, length) {
   let string = ''

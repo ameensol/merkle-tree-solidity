@@ -17,10 +17,11 @@ import { sha3 } from 'ethereumjs-util'
 // Expects elements to be Buffers of length 32
 // empty string elements will be removed prior to the buffer check
 function MerkleTree(elements) {
-  this.elements = Array.from(new Set(elements.filter(a => a).sort()))
+  this.elements = Array.from(new Set(elements.filter(a => a)))
   if (this.elements.some((e) => !(e.length == 32 && Buffer.isBuffer(e)))) {
     throw new Error('elements must be 32 byte buffers')
   }
+  this.elements.sort(Buffer.compare)
   this.layers = getLayers(this.elements)
   return this
 }
@@ -64,7 +65,7 @@ export { checkProof, merkleRoot, checkProofSolidityFactory }
 function combinedHash(first, second) {
   if (!second) { return first }
   if (!first) { return second }
-  return sha3(Buffer.concat([first, second].sort(Buffer.compare)))
+  return sha3(bufSortJoin(first, second))
 }
 
 function getNextLayer(elements) {
@@ -106,5 +107,9 @@ function getPair(index, layer) {
 
 function bufToHex(element) {
   return Buffer.isBuffer(element) ? '0x' + element.toString('hex') : element
+}
+
+function bufSortJoin(...args) {
+  return Buffer.concat([...args].sort(Buffer.compare))
 }
 

@@ -64,8 +64,7 @@ export { checkProof, merkleRoot, checkProofSolidityFactory }
 function combinedHash(first, second) {
   if (!second) { return first }
   if (!first) { return second }
-  if (first > second) { return sha3(second + first) }
-  return sha3(first + second)
+  return sha3(Buffer.concat([first, second].sort(Buffer.compare)))
 }
 
 function getNextLayer(elements) {

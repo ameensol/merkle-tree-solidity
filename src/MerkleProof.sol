@@ -1,7 +1,8 @@
 pragma solidity ^0.4.7;
 
 contract MerkleProof {
-  function checkProof(bytes merkleProof, bytes32 root, bytes32 hash) constant returns (bool) {
+
+  function checkProof(bytes merkleProof, bytes32 root, bytes32 hash) constant returns (bytes32) {
     bytes32 el;
     bytes32 h = hash;
 
@@ -17,7 +18,7 @@ contract MerkleProof {
         }
     }
 
-    return h == root;
+    return h;
   }
 }
 

@@ -5,14 +5,6 @@ import { sha3 } from 'ethereumjs-util'
 import setup from './setup'
 import MerkleTree, { checkProof, merkleRoot, checkProofSolidityFactory } from './merkle'
 
-
-// TODO
-// need better merkle tree
-// upgrade solc for faster compiles?
-// dedicated deploy scripts
-// mocha async
-// - http://staxmanade.com/2015/11/testing-asyncronous-code-with-mochajs-and-es7-async-await/
-
 describe('MerkleTree', () => {
   it('empty', () => {
     assert.equal(merkleRoot([]), '')
@@ -140,8 +132,12 @@ describe('MerkleTree', () => {
 
 describe('solidity', async () => {
 
+  // removing constant makes solidity return a txHash instead of the return
+  // value
+
   let merkleProof, eth, accounts, web3
   let checkProofSolidity
+  let filter
 
   before(async () => {
     let result = await setup()
@@ -150,9 +146,11 @@ describe('solidity', async () => {
     accounts = result.accounts
     web3 = result.web3
     checkProofSolidity = checkProofSolidityFactory(merkleProof.checkProof)
+    filter = web3.eth.filter({ address: merkleProof.address, fromBlock: 0 })
   })
 
   it('checkProof - two', async () => {
+
     const hash_0 = Buffer(makeString('a', 32))
     const hash_1 = Buffer(makeString('b', 32))
 
@@ -186,19 +184,29 @@ describe('solidity', async () => {
     assert.notOk((await checkProofSolidity(proof0, root, hash_0))[0])
   })
 
-  it('checkProof - many', async () => {
+  it.only('checkProof - many', async () => {
     const many = 10
 
     for (let i = 1; i <= many; i++) {
       let elements = range(i).map(e => sha3(e))
+      elements.sort(Buffer.compare)
+      console.log('elements')
+      console.log(elements.map(e => `0x${e.toString('hex')}`))
       let merkleTree = new MerkleTree(elements)
       let root = merkleTree.getRoot()
+      console.log('root:', root)
 
-      elements.forEach(async (element) => {
+      for (let element of elements) {
+        console.log(i, element)
         let proof = merkleTree.getProof(element)
+        console.log('proof:', proof)
         assert.ok(checkProof(proof, root, element))
-        assert.ok((await checkProofSolidity(proof, root, element))[0])
-      })
+        let result = (await checkProofSolidity(proof, root, element))
+        console.log('result:', result[0])
+        let check = Buffer(result[0].slice(2), 'hex').equals(root)
+        console.log('check:', check)
+        assert.ok(check)
+      }
 
       const reverseTree = new MerkleTree(elements.reverse())
       assert.ok(root.equals(reverseTree.getRoot()))

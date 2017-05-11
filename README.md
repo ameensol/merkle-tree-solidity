@@ -91,8 +91,10 @@ const root = merkleTree.getRoot()
 const proof = merkleTree.getProof(elements[0])
 
 // check merkle proof of ordered tree in JS
+// expects 1-n indexed element position as last param
 // returns bool
-checkProofOrdered(proof, root, elements[0])
+const index = 1
+checkProofOrdered(proof, root, elements[0], index)
 
 // create the contract abstraction
 const merkleProof = await deployMerkleProofContract()

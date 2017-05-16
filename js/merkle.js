@@ -21,6 +21,10 @@ import { sha3 } from 'ethereumjs-util'
 // empty string elements will be removed prior to the buffer check
 // by default, order is not preserved
 function MerkleTree(elements, preserveOrder) {
+  if (!(this instanceof MerkleTree)) {
+    return new MerkleTree(elements, preserveOrder)
+  }
+
   this.elements = Array.from(new Set(elements.filter(a => a)))
   if (this.elements.some((e) => !(e.length == 32 && Buffer.isBuffer(e)))) {
     throw new Error('elements must be 32 byte buffers')
@@ -30,19 +34,18 @@ function MerkleTree(elements, preserveOrder) {
     this.elements.sort(Buffer.compare)
   }
   this.layers = getLayers(this.elements, this.preserveOrder)
-  return this
 }
 
 MerkleTree.prototype.getRoot = function() {
   return this.layers[this.layers.length - 1][0]
 }
 
-MerkleTree.prototype.getProof = function(element) {
+MerkleTree.prototype.getProof = function(element, hex) {
   const index = this.elements.indexOf(element)
   if (index == -1) {
     throw new Error('element not found in merkle tree')
   }
-  return getProof(index, this.layers)
+  return getProof(index, this.layers, hex)
 }
 
 const checkProofOrdered = function(proof, root, element, index) {
@@ -136,13 +139,18 @@ function getLayers(elements, preserveOrder) {
   return layers
 }
 
-function getProof(index, layers) {
-  return layers.reduce((proof, layer) => {
+function getProof(index, layers, hex) {
+  const proof = layers.reduce((proof, layer) => {
     let pair = getPair(index, layer)
     if (pair) { proof.push(pair) }
     index = Math.floor(index / 2)
     return proof
   }, [])
+  if (hex) {
+    return '0x' + proof.map(e => e.toString('hex')).join('')
+  } else {
+    return proof
+  }
 }
 
 function getPair(index, layer) {

@@ -64,6 +64,8 @@ const checkProofSolidity = checkProofSolidityFactory(merkleProof.checkProof)
 await checkProofSolidity(proof, root, elements[0]) // -> true
 ```
 
+### Ordered Merkle Trees
+
 By default, generating the tree doesn't preserve leaf order, but we can
 optionally do so.
 
@@ -83,6 +85,11 @@ const merkleTree = new MerkleTree(elements, true)
 // get the merkle root
 // returns 32 byte buffer
 const root = merkleTree.getRoot()
+
+// for convenience if only the root is desired
+// this creates a new MerkleTree under the hood
+// 2nd arg is "preserveOrder" flag
+const easyRoot = merkleRoot(elements, true)
 
 // [same as above]
 // get the merkle root

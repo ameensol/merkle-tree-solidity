@@ -81,8 +81,8 @@ const checkProof = function(proof, root, element) {
   }, element))
 }
 
-const merkleRoot = function(elements) {
-  return (new MerkleTree(elements)).getRoot()
+const merkleRoot = function(elements, preserveOrder) {
+  return (new MerkleTree(elements, preserveOrder)).getRoot()
 }
 
 // converts buffers from MerkleRoot functions into hex strings

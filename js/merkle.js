@@ -41,7 +41,7 @@ MerkleTree.prototype.getRoot = function() {
 }
 
 MerkleTree.prototype.getProof = function(element, hex) {
-  const index = this.elements.indexOf(element)
+  const index = getBufIndex(element, this.elements)
   if (index == -1) {
     throw new Error('element not found in merkle tree')
   }
@@ -160,6 +160,13 @@ function getPair(index, layer) {
   } else {
     return null
   }
+}
+
+function getBufIndex(element, array) {
+  for (let i = 0; i < array.length; i++) {
+    if (element.equals(array[i])) { return i }
+  }
+  return -1
 }
 
 function bufToHex(element) {

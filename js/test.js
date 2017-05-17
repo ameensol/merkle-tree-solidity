@@ -63,6 +63,22 @@ describe('MerkleTree -- no preserving order', () => {
     assert.isTrue(checkProof(proof, root, hash_0))
   })
 
+  it('one -- different element object', () => {
+    // this test is here because getProof was doing an indexOf deep equality
+    // search to determine if the element was in the tree
+    // it should still work with different but equal buffer objects
+    const hash_0 = sha3('x')
+    const hash_0_dup = sha3('x')
+
+    const merkleTree = new MerkleTree([hash_0])
+    const proof = merkleTree.getProof(hash_0_dup)
+    const root = merkleTree.getRoot()
+
+    assert.sameMembers(proof, [])
+    assert.equal(root, hash_0)
+    assert.isTrue(checkProof(proof, root, hash_0))
+  })
+
   it('two', () => {
     const hash_0 = Buffer(makeString('a', 32))
     const hash_1 = Buffer(makeString('b', 32))

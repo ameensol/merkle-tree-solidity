@@ -27,7 +27,7 @@ import MerkleTree, { checkProof, merkleRoot, checkProofSolidityFactory } from 'm
 import { sha3 } from 'ethereumjs-util'
 
 // create merkle tree
-// expects 32 byte buffers as inputs (no hex strings)
+// expects unique 32 byte buffers as inputs (no hex strings)
 // if using web3.sha3, convert first -> Buffer(web3.sha3('a'), 'hex')
 const elements = [1, 2, 3].map(e => sha3(e))
 const merkleTree = new MerkleTree(elements)
@@ -91,11 +91,16 @@ const root = merkleTree.getRoot()
 // 2nd arg is "preserveOrder" flag
 const easyRoot = merkleRoot(elements, true)
 
-// [same as above]
-// get the merkle root
 // generate merkle proof
+// 2nd argugment is the 1-n index of the element
 // returns array of 32 byte buffers
-const proof = merkleTree.getProof(elements[0])
+const index = 1
+const proof = merkleTree.getProofOrdered(elements[0], index)
+
+// this is useful if you have duplicates in your tree
+const elements2 = [3, 2, 3].map(e => sha3(e))
+const index2 = 3
+const proof2 = merkleTree.getProof(sha3(3), 3)
 
 // check merkle proof of ordered tree in JS
 // expects 1-n indexed element position as last param

@@ -1,6 +1,6 @@
 {
   "name": "merkle-tree-solidity",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "JS - Solidity sha3 merkle tree bridge. Generate proofs in JS; verify in Solidity.",
   "main": "index.js",
   "scripts": {

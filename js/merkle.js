@@ -18,21 +18,28 @@
 import { sha3 } from 'ethereumjs-util'
 
 // Expects elements to be Buffers of length 32
-// empty string elements will be removed prior to the buffer check
+// Empty string elements will be removed prior to the buffer check
 // by default, order is not preserved
 function MerkleTree(elements, preserveOrder) {
   if (!(this instanceof MerkleTree)) {
     return new MerkleTree(elements, preserveOrder)
   }
 
-  this.elements = Array.from(new Set(elements.filter(a => a)))
+  // remove empty strings
+  this.elements = elements.filter(a => a)
+
+  // check buffers
   if (this.elements.some((e) => !(e.length == 32 && Buffer.isBuffer(e)))) {
     throw new Error('elements must be 32 byte buffers')
   }
+
+  // if we are not preserving order, dedup and sort
   this.preserveOrder = !!preserveOrder
   if (!this.preserveOrder) {
+    this.elements = bufDedup(this.elements)
     this.elements.sort(Buffer.compare)
   }
+
   this.layers = getLayers(this.elements, this.preserveOrder)
 }
 
@@ -46,6 +53,14 @@ MerkleTree.prototype.getProof = function(element, hex) {
     throw new Error('element not found in merkle tree')
   }
   return getProof(index, this.layers, hex)
+}
+
+// Expects 1-n index, converts it to 0-n index internally
+MerkleTree.prototype.getProofOrdered = function(element, index, hex) {
+  if (!(element.equals(this.elements[index - 1]))) {
+    throw new Error('element does not match leaf at index in tree')
+  }
+  return getProof(index - 1, this.layers, hex)
 }
 
 const checkProofOrdered = function(proof, root, element, index) {
@@ -181,3 +196,8 @@ function bufSortJoin(...args) {
   return Buffer.concat([...args].sort(Buffer.compare))
 }
 
+function bufDedup(buffers) {
+  return buffers.filter((buffer, i) => {
+    return getBufIndex(buffer, buffers) == i
+  })
+}

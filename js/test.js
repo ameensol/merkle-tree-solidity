@@ -6,6 +6,9 @@ import setup from './setup'
 import MerkleTree, { checkProof, checkProofOrdered,
   merkleRoot, checkProofSolidityFactory, checkProofOrderedSolidityFactory
 } from '../index'
+// import MerkleTree, { checkProof, checkProofOrdered,
+//   merkleRoot, checkProofSolidityFactory, checkProofOrderedSolidityFactory
+// } from './merkle'
 
 describe('MerkleTree -- no preserving order', () => {
   it('empty', () => {
@@ -47,6 +50,18 @@ describe('MerkleTree -- no preserving order', () => {
     assert.equal(merkleRoot([hash_0, hash_0]), hash_0)
 
     const result_0 = merkleRoot([hash_0, hash_1, hash_0])
+    const result_1 = merkleRoot([hash_0, hash_1])
+    assert.isTrue(result_0.equals(result_1))
+  })
+
+  it('duplicates -- with different buffer objects', () => {
+    const hash_0 = sha3('x')
+    const hash_0_dup = sha3('x')
+    const hash_1 = sha3('y')
+
+    assert.equal(merkleRoot([hash_0, hash_0_dup]), hash_0)
+
+    const result_0 = merkleRoot([hash_0, hash_1, hash_0_dup])
     const result_1 = merkleRoot([hash_0, hash_1])
     assert.isTrue(result_0.equals(result_1))
   })
@@ -147,7 +162,7 @@ describe('MerkleTree -- no preserving order', () => {
   })
 })
 
-describe('MerkleTree -- preserve order', () => {
+describe('MerkleTree [preserve order]', () => {
   it('two', () => {
     const hash_0 = Buffer(makeString('a', 32))
     const hash_1 = Buffer(makeString('b', 32))
@@ -197,6 +212,37 @@ describe('MerkleTree -- preserve order', () => {
     assert.isTrue(checkProofOrdered(proof2, root, hash_2, 3))
   })
 
+  it('three -- duplicates are preserved', () => {
+    const hash_0 = Buffer(makeString('a', 32))
+    const hash_1 = Buffer(makeString('b', 32))
+    const hash_2 = Buffer(makeString('a', 32))
+
+    const hash_01 = Buffer('6d65ef9ca93d3516a4d38ab7d989c2b500e2fc89ccdcf878f9c46daaf6ad0d5b', 'hex')
+
+    const calculated_01 = sha3(bufJoin(hash_0, hash_1))
+    assert.isTrue(calculated_01.equals(hash_01))
+
+    const calculatedRoot = sha3(bufJoin(hash_01, hash_2))
+
+    const merkleTree = new MerkleTree([hash_0, hash_1, hash_2], true)
+    const proof0 = merkleTree.getProofOrdered(hash_0, 1)
+    const root = merkleTree.getRoot()
+
+    assert.sameMembers(proof0, [hash_1, hash_2])
+    assert.isTrue(root.equals(calculatedRoot))
+    assert.isTrue(checkProofOrdered(proof0, root, hash_0, 1))
+
+    const proof1 = merkleTree.getProofOrdered(hash_1, 2)
+
+    assert.sameMembers(proof1, [hash_0, hash_2])
+    assert.isTrue(checkProofOrdered(proof1, root, hash_1, 2))
+
+    const proof2 = merkleTree.getProofOrdered(hash_2, 3)
+
+    assert.isTrue(proof2[0].equals(hash_01))
+    assert.isTrue(checkProofOrdered(proof2, root, hash_2, 3))
+  })
+
   it('many', () => {
     const many = 10
 
@@ -206,7 +252,22 @@ describe('MerkleTree -- preserve order', () => {
       let root = merkleTree.getRoot()
 
       elements.forEach((element, index) => {
-        let proof = merkleTree.getProof(element)
+        let proof = merkleTree.getProofOrdered(element, index+1)
+        assert.isTrue(checkProofOrdered(proof, root, element, index+1))
+      })
+    }
+  })
+
+  it('many -- with duplicates', () => {
+    const many = 10
+
+    for (let i = 1; i <= many; i++) {
+      let elements = range(i).map(e => sha3(e % 5))
+      let merkleTree = new MerkleTree(elements, true)
+      let root = merkleTree.getRoot()
+
+      elements.forEach((element, index) => {
+        let proof = merkleTree.getProofOrdered(element, index+1)
         assert.isTrue(checkProofOrdered(proof, root, element, index+1))
       })
     }

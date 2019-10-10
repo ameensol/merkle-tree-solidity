@@ -1,7 +1,7 @@
 {
   "name": "merkle-tree-solidity",
   "version": "1.0.8",
-  "description": "JS - Solidity sha3 merkle tree bridge. Generate proofs in JS; verify in Solidity.",
+  "description": "JS - Solidity keccak256 merkle tree bridge. Generate proofs in JS; verify in Solidity.",
   "main": "index.js",
   "scripts": {
     "test": "mocha ./js/loader_test.js -R spec --timeout 2000000",
@@ -14,7 +14,7 @@
   "dependencies": {
     "es6-promisify": "^5.0.0",
     "ether-pudding": "^3.2.0",
-    "ethereumjs-util": "^5.1.1",
+		"ethereumjs-util": "^6.1.0",
     "ethjs-contract": "^0.1.7",
     "ethjs-provider-http": "^0.1.4",
     "ethjs-query": "^0.2.1",

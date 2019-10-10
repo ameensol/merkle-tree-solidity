@@ -2,7 +2,7 @@ pragma solidity ^0.4.7;
 
 contract MerkleProof {
 
-  function checkProof(bytes proof, bytes32 root, bytes32 hash) constant returns (bool) {
+  function checkProof(bytes proof, bytes32 root, bytes32 hash) public pure returns (bool) {
     bytes32 el;
     bytes32 h = hash;
 
@@ -12,9 +12,9 @@ contract MerkleProof {
         }
 
         if (h < el) {
-            h = sha3(h, el);
+            h = keccak256(abi.encodePacked(h, el));
         } else {
-            h = sha3(el, h);
+            h = keccak256(abi.encodePacked(el, h));
         }
     }
 
@@ -24,7 +24,7 @@ contract MerkleProof {
   // from StorJ -- https://github.com/nginnever/storj-audit-verifier/blob/master/contracts/MerkleVerifyv3.sol
   function checkProofOrdered(
     bytes proof, bytes32 root, bytes32 hash, uint256 index
-  ) constant returns (bool) {
+  )  public pure returns (bool) {
     // use the index to determine the node ordering
     // index ranges 1 to n
 
@@ -48,10 +48,10 @@ contract MerkleProof {
       }
 
       if (index % 2 == 0) {
-        h = sha3(el, h);
+        h = keccak256(abi.encodePacked(el, h));
         index = index / 2;
       } else {
-        h = sha3(h, el);
+        h = keccak256(abi.encodePacked(h, el));
         index = uint(index) / 2 + 1;
       }
     }

@@ -1,6 +1,6 @@
 ## merkle-tree-solidity
 
-JS - Solidity sha3 merkle tree bridge. Generate proofs in JS; verify in Solidity.
+JS - Solidity keccak256 merkle tree bridge. Generate proofs in JS; verify in Solidity.
 
 ## Install
 
@@ -24,12 +24,12 @@ https://github.com/raiden-network/raiden/blob/master/raiden/smart_contracts/Nett
 
 ```js
 import MerkleTree, { checkProof, merkleRoot, checkProofSolidityFactory } from 'merkle-tree-solidity'
-import { sha3 } from 'ethereumjs-util'
+import { keccak256 } from 'ethereumjs-util'
 
 // create merkle tree
 // expects unique 32 byte buffers as inputs (no hex strings)
-// if using web3.sha3, convert first -> Buffer(web3.sha3('a'), 'hex')
-const elements = [1, 2, 3].map(e => sha3(e))
+// if using web3.keccak256, convert first -> Buffer(web3.keccak256('a'), 'hex')
+const elements = [1, 2, 3].map(e => keccak256(e))
 const merkleTree = new MerkleTree(elements)
 
 // get the merkle root
@@ -71,12 +71,12 @@ optionally do so.
 
 ```js
 import MerkleTree, { checkProofOrdered, merkleRoot, checkProofOrderedSolidityFactory } from 'merkle-tree-solidity'
-import { sha3 } from 'ethereumjs-util'
+import { keccak256 } from 'ethereumjs-util'
 
 // create merkle tree
 // expects 32 byte buffers as inputs (no hex strings)
-// if using web3.sha3, convert first -> Buffer(web3.sha3('a'), 'hex')
-const elements = [1, 2, 3].map(e => sha3(e))
+// if using web3.keccak256, convert first -> Buffer(web3.keccak256('a'), 'hex')
+const elements = [1, 2, 3].map(e => keccak256(e))
 
 // include the 'true' flag when generating the merkle tree
 const merkleTree = new MerkleTree(elements, true)
@@ -98,9 +98,9 @@ const index = 1
 const proof = merkleTree.getProofOrdered(elements[0], index)
 
 // this is useful if you have duplicates in your tree
-const elements2 = [3, 2, 3].map(e => sha3(e))
+const elements2 = [3, 2, 3].map(e => keccak256(e))
 const index2 = 3
-const proof2 = merkleTree.getProof(sha3(3), 3)
+const proof2 = merkleTree.getProof(keccak256(3), 3)
 
 // check merkle proof of ordered tree in JS
 // expects 1-n indexed element position as last param

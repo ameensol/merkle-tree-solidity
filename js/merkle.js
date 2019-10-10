@@ -15,7 +15,7 @@
 // [ elements, combinedHashes1, combinedHashes2, ... root]
 // root is a length 1 array
 
-import { sha3 } from 'ethereumjs-util'
+import { keccak256 } from 'ethereumjs-util'
 
 // Expects elements to be Buffers of length 32
 // Empty string elements will be removed prior to the buffer check
@@ -129,9 +129,9 @@ function combinedHash(first, second, preserveOrder) {
   if (!second) { return first }
   if (!first) { return second }
   if (preserveOrder) {
-    return sha3(bufJoin(first, second))
+    return keccak256(bufJoin(first, second))
   } else {
-    return sha3(bufSortJoin(first, second))
+    return keccak256(bufSortJoin(first, second))
   }
 }
 

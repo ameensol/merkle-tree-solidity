@@ -1,7 +1,7 @@
 import { assert } from 'chai'
 import p from 'es6-promisify'
 import Web3 from 'web3'
-import { sha3 } from 'ethereumjs-util'
+import { keccak256 } from 'ethereumjs-util'
 import setup from './setup'
 import MerkleTree, { checkProof, checkProofOrdered,
   merkleRoot, checkProofSolidityFactory, checkProofOrderedSolidityFactory
@@ -39,13 +39,13 @@ describe('MerkleTree -- no preserving order', () => {
   })
 
   it('single', () => {
-    const hash_0 = sha3('x')
+    const hash_0 = keccak256('x')
     assert.equal(merkleRoot([hash_0]), hash_0)
   })
 
   it('duplicates', () => {
-    const hash_0 = sha3('x')
-    const hash_1 = sha3('y')
+    const hash_0 = keccak256('x')
+    const hash_1 = keccak256('y')
 
     assert.equal(merkleRoot([hash_0, hash_0]), hash_0)
 
@@ -55,9 +55,9 @@ describe('MerkleTree -- no preserving order', () => {
   })
 
   it('duplicates -- with different buffer objects', () => {
-    const hash_0 = sha3('x')
-    const hash_0_dup = sha3('x')
-    const hash_1 = sha3('y')
+    const hash_0 = keccak256('x')
+    const hash_0_dup = keccak256('x')
+    const hash_1 = keccak256('y')
 
     assert.equal(merkleRoot([hash_0, hash_0_dup]), hash_0)
 
@@ -67,7 +67,7 @@ describe('MerkleTree -- no preserving order', () => {
   })
 
   it('one', () => {
-    const hash_0 = sha3('x')
+    const hash_0 = keccak256('x')
 
     const merkleTree = new MerkleTree([hash_0])
     const proof = merkleTree.getProof(hash_0)
@@ -82,8 +82,8 @@ describe('MerkleTree -- no preserving order', () => {
     // this test is here because getProof was doing an indexOf deep equality
     // search to determine if the element was in the tree
     // it should still work with different but equal buffer objects
-    const hash_0 = sha3('x')
-    const hash_0_dup = sha3('x')
+    const hash_0 = keccak256('x')
+    const hash_0_dup = keccak256('x')
 
     const merkleTree = new MerkleTree([hash_0])
     const proof = merkleTree.getProof(hash_0_dup)
@@ -103,7 +103,7 @@ describe('MerkleTree -- no preserving order', () => {
     const root = merkleTree.getRoot()
 
     assert.sameMembers(proof0, [hash_1])
-    assert.isTrue(root.equals(sha3(bufSortJoin(hash_0, hash_1))))
+    assert.isTrue(root.equals(keccak256(bufSortJoin(hash_0, hash_1))))
     assert.isTrue(checkProof(proof0, root, hash_0))
 
     const proof1 = merkleTree.getProof(hash_1)
@@ -119,10 +119,10 @@ describe('MerkleTree -- no preserving order', () => {
 
     const hash_01 = Buffer('6d65ef9ca93d3516a4d38ab7d989c2b500e2fc89ccdcf878f9c46daaf6ad0d5b', 'hex')
 
-    const calculated_01 = sha3(bufSortJoin(hash_0, hash_1))
+    const calculated_01 = keccak256(bufSortJoin(hash_0, hash_1))
     assert.isTrue(calculated_01.equals(hash_01))
 
-    const calculatedRoot = sha3(bufSortJoin(hash_01, hash_2))
+    const calculatedRoot = keccak256(bufSortJoin(hash_01, hash_2))
 
     const merkleTree = new MerkleTree([hash_0, hash_1, hash_2])
     const proof0 = merkleTree.getProof(hash_0)
@@ -147,7 +147,7 @@ describe('MerkleTree -- no preserving order', () => {
     const many = 10
 
     for (let i = 1; i <= many; i++) {
-      let elements = range(i).map(e => sha3(e))
+      let elements = range(i).map(e => keccak256(e))
       let merkleTree = new MerkleTree(elements)
       let root = merkleTree.getRoot()
 
@@ -172,7 +172,7 @@ describe('MerkleTree [preserve order]', () => {
     const root = merkleTree.getRoot()
 
     assert.sameMembers(proof0, [hash_1])
-    assert.isTrue(root.equals(sha3(bufJoin(hash_0, hash_1))))
+    assert.isTrue(root.equals(keccak256(bufJoin(hash_0, hash_1))))
     assert.isTrue(checkProofOrdered(proof0, root, hash_0, 1))
 
     const proof1 = merkleTree.getProof(hash_1)
@@ -188,10 +188,10 @@ describe('MerkleTree [preserve order]', () => {
 
     const hash_01 = Buffer('6d65ef9ca93d3516a4d38ab7d989c2b500e2fc89ccdcf878f9c46daaf6ad0d5b', 'hex')
 
-    const calculated_01 = sha3(bufJoin(hash_0, hash_1))
+    const calculated_01 = keccak256(bufJoin(hash_0, hash_1))
     assert.isTrue(calculated_01.equals(hash_01))
 
-    const calculatedRoot = sha3(bufJoin(hash_01, hash_2))
+    const calculatedRoot = keccak256(bufJoin(hash_01, hash_2))
 
     const merkleTree = new MerkleTree([hash_0, hash_1, hash_2], true)
     const proof0 = merkleTree.getProof(hash_0)
@@ -219,10 +219,10 @@ describe('MerkleTree [preserve order]', () => {
 
     const hash_01 = Buffer('6d65ef9ca93d3516a4d38ab7d989c2b500e2fc89ccdcf878f9c46daaf6ad0d5b', 'hex')
 
-    const calculated_01 = sha3(bufJoin(hash_0, hash_1))
+    const calculated_01 = keccak256(bufJoin(hash_0, hash_1))
     assert.isTrue(calculated_01.equals(hash_01))
 
-    const calculatedRoot = sha3(bufJoin(hash_01, hash_2))
+    const calculatedRoot = keccak256(bufJoin(hash_01, hash_2))
 
     const merkleTree = new MerkleTree([hash_0, hash_1, hash_2], true)
     const proof0 = merkleTree.getProofOrdered(hash_0, 1)
@@ -247,7 +247,7 @@ describe('MerkleTree [preserve order]', () => {
     const many = 10
 
     for (let i = 1; i <= many; i++) {
-      let elements = range(i).map(e => sha3(e))
+      let elements = range(i).map(e => keccak256(e))
       let merkleTree = new MerkleTree(elements, true)
       let root = merkleTree.getRoot()
 
@@ -262,7 +262,7 @@ describe('MerkleTree [preserve order]', () => {
     const many = 10
 
     for (let i = 1; i <= many; i++) {
-      let elements = range(i).map(e => sha3(e % 5))
+      let elements = range(i).map(e => keccak256(e % 5))
       let merkleTree = new MerkleTree(elements, true)
       let root = merkleTree.getRoot()
 
@@ -298,7 +298,7 @@ describe('solidity -- checkProof', async () => {
     const proof0 = merkleTree.getProof(hash_0)
 
     assert.sameMembers(proof0, [hash_1])
-    assert.isTrue(root.equals(sha3(hash_0 + hash_1)))
+    assert.isTrue(root.equals(keccak256(hash_0 + hash_1)))
     assert.isTrue(checkProof(proof0, root, hash_0))
     assert.isTrue((await checkProofSolidity(proof0, root, hash_0))[0])
 
@@ -318,7 +318,7 @@ describe('solidity -- checkProof', async () => {
     const proof0 = merkleTree.getProof(hash_1) // switched hashes
 
     assert.sameMembers(proof0, [hash_0])
-    assert.isTrue(root.equals(sha3(hash_0 + hash_1)))
+    assert.isTrue(root.equals(keccak256(hash_0 + hash_1)))
     assert.isFalse(checkProof(proof0, root, hash_0))
     assert.isFalse((await checkProofSolidity(proof0, root, hash_0))[0])
   })
@@ -327,7 +327,7 @@ describe('solidity -- checkProof', async () => {
     const many = 10
 
     for (let i = 1; i <= many; i++) {
-      let elements = range(i).map(e => sha3(e))
+      let elements = range(i).map(e => keccak256(e))
       elements.sort(Buffer.compare)
       let merkleTree = new MerkleTree(elements)
       let root = merkleTree.getRoot()
@@ -368,7 +368,7 @@ describe('solidity -- checkProofOrdered', async () => {
     const proof0 = merkleTree.getProof(hash_0)
 
     assert.sameMembers(proof0, [hash_1])
-    assert.isTrue(root.equals(sha3(hash_0 + hash_1)))
+    assert.isTrue(root.equals(keccak256(hash_0 + hash_1)))
     assert.isTrue(checkProof(proof0, root, hash_0))
     assert.isTrue((await checkProofSolidity(proof0, root, hash_0, 1))[0])
 
@@ -388,7 +388,7 @@ describe('solidity -- checkProofOrdered', async () => {
     const proof0 = merkleTree.getProof(hash_1) // switched hashes
 
     assert.sameMembers(proof0, [hash_0])
-    assert.isTrue(root.equals(sha3(hash_0 + hash_1)))
+    assert.isTrue(root.equals(keccak256(hash_0 + hash_1)))
     assert.isFalse(checkProof(proof0, root, hash_0))
     assert.isFalse((await checkProofSolidity(proof0, root, hash_0, 1))[0])
   })
@@ -397,7 +397,7 @@ describe('solidity -- checkProofOrdered', async () => {
     const many = 10
 
     for (let i = 1; i <= many; i++) {
-      let elements = range(i).map(e => sha3(e))
+      let elements = range(i).map(e => keccak256(e))
       elements.sort(Buffer.compare)
       let merkleTree = new MerkleTree(elements, true)
       let root = merkleTree.getRoot()

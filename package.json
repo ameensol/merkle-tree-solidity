@@ -31,7 +31,7 @@
     "babel-preset-stage-2": "^6.5.0",
     "babel-register": "^6.18.0",
     "chai": "^3.5.0",
-    "eslint": "^2.9.0",
+    "eslint": "^6.6.0",
     "ethereumjs-testrpc": "^3.0.3",
     "mocha": "^3.2.0"
   }

@@ -15,7 +15,7 @@
     "es6-promisify": "^5.0.0",
     "ether-pudding": "^3.2.0",
     "ethereumjs-util": "^5.1.1",
-    "ethjs-contract": "^0.1.7",
+    "ethjs-contract": "^0.2.3",
     "ethjs-provider-http": "^0.1.4",
     "ethjs-query": "^0.3.8",
     "left-pad": "^1.1.3",
